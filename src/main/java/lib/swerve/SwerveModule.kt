@@ -13,6 +13,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.networktables.NetworkTable
 import edu.wpi.first.networktables.NetworkTableInstance
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import frc.robot.Constants
 import lib.math.wrapDegrees
 import lib.motors.setLoopRampRate
@@ -29,13 +31,16 @@ class SwerveModule {
     val angleMotorInverted: Boolean
     val driveMotorInverted: Boolean
 
-    val table: NetworkTable
+    val table: ShuffleboardTab
     val index: Int
 
     val drivePID: SparkPIDController
     val anglePID: SparkPIDController
     val drivePIDConfig: PIDConfig
     val anglePIDConfig: PIDConfig
+
+    var angleSetPoint: Double = 0.0
+    var velocitySetPoint: Double = 0.0
 
     constructor(
         driveMotorID: Int,
@@ -50,7 +55,7 @@ class SwerveModule {
         index: Int
     ) {
         this.index = index
-        table = NetworkTableInstance.getDefault().getTable("Module[$index]")
+        table = Shuffleboard.getTab("Swerve Modules")
 
         driveMotor = CANSparkMax(driveMotorID, CANSparkLowLevel.MotorType.kBrushless)
         angleMotor = CANSparkMax(angleMotorID, CANSparkLowLevel.MotorType.kBrushless)
@@ -98,6 +103,7 @@ class SwerveModule {
         anglePID.setPositionPIDWrappingMinInput(0.0)
         anglePID.setPositionPIDWrappingMaxInput(2 * Math.PI)
 
+
         anglePID.setOutputRange(-1.0, 1.0)
         drivePID.setOutputRange(-1.0, 1.0)
 
@@ -106,7 +112,18 @@ class SwerveModule {
         driveMotor.burnFlash()
         angleMotor.burnFlash()
 
-
+        table.addDouble("Module $index Angle") { getRelativeAngle().degrees }
+            .withPosition(0, index)
+        table.addDouble("Module $index Desired Angle") { angleSetPoint }
+            .withPosition(1, index)
+        table.addDouble("Module $index Velocity") { driveMotor.encoder.velocity }
+            .withPosition(2, index)
+        table.addDouble("Module $index Desired Velocity") { velocitySetPoint }
+            .withPosition(3, index)
+        table.addDouble("Module $index Drive Voltage") { getDriveVoltage() }
+            .withPosition(4, index)
+        table.addDouble("Module $index Angle Voltage") { getAngleVoltage() }
+            .withPosition(5, index)
     }
 
     fun getAbsoluteAngle(): Rotation2d {
@@ -144,6 +161,7 @@ class SwerveModule {
             getRelativeAngle()
         )
 
+
         drivePID.setReference(
             correctedState.speedMetersPerSecond,
             CANSparkBase.ControlType.kVelocity
@@ -153,11 +171,22 @@ class SwerveModule {
             correctedState.angle.radians,
             CANSparkBase.ControlType.kPosition
         )
+
+        angleSetPoint = correctedState.angle.radians
+        velocitySetPoint = correctedState.speedMetersPerSecond
     }
 
     fun resetEncoders() {
         driveMotor.encoder.setPosition(0.0)
         angleMotor.encoder.setPosition(getAbsoluteAngle().radians)
+    }
+
+    fun getDriveVoltage(): Double {
+        return driveMotor.appliedOutput * driveMotor.busVoltage
+    }
+
+    fun getAngleVoltage(): Double {
+        return angleMotor.appliedOutput * angleMotor.busVoltage
     }
 
 

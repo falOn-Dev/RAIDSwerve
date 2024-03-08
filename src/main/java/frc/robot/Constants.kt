@@ -29,13 +29,10 @@ object Constants
     }
 
     object PIDConstants {
-        val DRIVE_PID = PIDConfig(0.0020645, 0.0, 0.0, 0.0, 0.0)
-        val ANGLE_PID = PIDConfig(0.6, 0.0001, 0.0, 0.0, 0.0)
+        val DRIVE_PID = PIDConfig(0.01, 0.0, 0.0, 0.0, 0.0)
+        val ANGLE_PID = PIDConfig(0.5, 0.0001, 0.001, 0.0, 0.0)
     }
 
-    object Modules {
-
-    }
 }
 
 
