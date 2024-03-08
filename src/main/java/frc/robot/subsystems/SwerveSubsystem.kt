@@ -121,8 +121,6 @@ object SwerveSubsystem : SubsystemBase() {
         SwerveDriveKinematics.desaturateWheelSpeeds(states, 3.0)
         modules.forEachIndexed() { index, module ->
             module.setDesiredState(states[index])
-            println("Setting Module[$index] to ${states[index].speedMetersPerSecond}")
-
         }
     }
 

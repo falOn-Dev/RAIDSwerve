@@ -29,7 +29,6 @@ class SimpleDriveCommand(
     override fun execute() {
         val speeds: ChassisSpeeds = ChassisSpeeds(forwards.asDouble, strafe.asDouble, rotation.asDouble)
         swerveSubsystem.setChassisSpeeds(speeds)
-        println("Executing ${this.name}")
     }
 
     override fun isFinished(): Boolean {

@@ -111,7 +111,7 @@ class SwerveModule {
 
     fun getAbsoluteAngle(): Rotation2d {
         val rot = Units.rotationsToDegrees(absoluteEncoder.position.valueAsDouble)
-        return Rotation2d.fromDegrees(wrapDegrees(rot - angleOffset))
+        return Rotation2d.fromDegrees(rot - angleOffset)
     }
 
     fun getRelativeAngle(): Rotation2d {

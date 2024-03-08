@@ -26,6 +26,12 @@ object RobotContainer
 {
     private val driverController = CommandXboxController(OperatorConstants.DRIVER_CONTROLLER_PORT)
 
+    val basicDrive: SimpleDriveCommand = SimpleDriveCommand(
+        { driverController.leftY },
+        { driverController.leftX },
+        { driverController.rightX }
+    )
+
     init
     {
         configureBindings()
@@ -34,11 +40,7 @@ object RobotContainer
         SwerveSubsystem
     }
 
-    val basicDrive: SimpleDriveCommand = SimpleDriveCommand(
-        { driverController.leftY },
-        { driverController.leftX },
-        { driverController.rightX }
-    )
+
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
 
@@ -52,6 +54,7 @@ object RobotContainer
     private fun configureBindings()
     {
         SwerveSubsystem.defaultCommand = basicDrive
+        println(SwerveSubsystem.defaultCommand)
 
         // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
         // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
